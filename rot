@@ -1,0 +1,50 @@
+#!/bin/bash
+
+if [ $# -lt 2 ]
+then
+	echo "rot: not enough arguments"
+	exit 1
+fi
+
+int_re='[0-9]+$'
+
+if ! [[ $1 =~ $int_re ]] || [ $1 -lt 0 ] || [ $1 -gt 25 ]
+then
+	echo "rot: invalid rotation amount"
+	exit 1
+fi
+
+if [ $1 -eq 0 ]
+then
+	echo $2
+	exit
+fi
+
+
+rotation=$1
+
+input_string=""
+
+shift
+for arg in $@
+do
+	input_string="$input_string $arg"
+done
+
+
+start_upper=$((65 + rotation))
+end_upper=$(($start_upper - 1))
+
+start_lower=$((97 + rotation))
+end_lower=$(($start_lower - 1))
+
+start_upper_char=$(printf "\x$(printf %x $start_upper)")
+end_upper_char=$(printf "\x$(printf %x $end_upper)")
+
+start_lower_char=$(printf "\x$(printf %x $start_lower)")
+end_lower_char=$(printf "\x$(printf %x $end_lower)")
+
+
+tr_re="$start_upper_char-ZA-$end_upper_char$start_lower_char-za-$end_lower_char"
+
+tr 'A-Za-z' $tr_re <<< $input_string
